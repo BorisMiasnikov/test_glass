@@ -50,49 +50,43 @@ try_json = {
 }
 list_json = []
 json_local = []
+
 '''Получаем все иномомарки из файла, и удаляем пустые строки'''
-foreign_car = sales['Автостекло. Аксессуары. Клей'] #получаем таблицу иномарок
-foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Наименование", "ОПТ"]].head()# фильтруем иномарки по нужным столбцам, вспомогательная переменная
-foreign_car_clear = foreign_car_supp[foreign_car_supp["Код AGC"].notna()]# фильтруем таблицу иномарок, убирая пустые строки ориентируясь на столбец "Код AGC"
+foreign_car = sales['Автостекло. Аксессуары. Клей']  # получаем таблицу иномарок
+foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Наименование", "Цена фиксирована",
+                                "ОПТ"]].head()  # фильтруем иномарки по нужным столбцам, вспомогательная переменная
+foreign_car_clear = foreign_car_supp[foreign_car_supp[
+    "Код AGC"].notna()]  # фильтруем таблицу иномарок, убирая пустые строки ориентируясь на столбец "Код AGC"
 
 '''Получаем все отечественные из файла, и удаляем пустые строки'''
-rus_car = sales['Российский автопром'] #получаем таблицу отечественных
-rus_car_supp = rus_car[["Вид стекла", "Код AGC", "Старый Код AGC", "Наименование", "ОПТ"]].head()#фильтруем отечетвенные по нужным столбцам, вспомогательная переменная
-rus_car_clear = rus_car_supp[rus_car_supp["Код AGC"].notna()]#фильтруем таблицу отечественных, убирая пустые строки ориентируясь на столбец "Код AGC"
+rus_car = sales['Российский автопром']  # получаем таблицу отечественных
+rus_car_supp = rus_car[["Вид стекла", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована",
+                        "ОПТ"]].head(20)  # фильтруем отечетвенные по нужным столбцам, вспомогательная переменная
+rus_car_clear = rus_car_supp[rus_car_supp[
+    "Код AGC"].notna()]  # фильтруем таблицу отечественных, убирая пустые строки ориентируясь на столбец "Код AGC"
 
 
 def create_json(data):
 
-    try_json_1 = {}
     list_json_1 = []
     for i in range(len(data)):
-        try_json_1["art"] = float(data.iloc[i]["Код AGC"])
-        if "Еврокод" in data:
-            try_json_1["eurocode"] = data.iloc[i]["Еврокод"]
+        try_json_1 = {}
+        try_json_1["art"] = int(data.iloc[i]["Код AGC"])
         try_json_1["name"] = data.iloc[i]["Наименование"]
         if "Еврокод" in data:
+            try_json_1["eurocode"] = data.iloc[i]["Еврокод"]
             try_json_1["catalog"] = 'Автостекло. Аксессуары. Клей'
+            try_json_1["price"] = data.iloc[i]['ОПТ']
         else:
             try_json_1["catalog"] = 'Российский автопром'
+        if str(data.iloc[i]['ОПТ']) == '*':
+            try_json_1["price"] = float(data.iloc[i]['Цена фиксирована'])
+        else:
+            try_json_1["price"] = data.iloc[i]['ОПТ']
         try_json_1["category"] = data.iloc[i]['Вид стекла']
-        try_json_1["price"] = 50
         list_json.append(try_json_1)
     return list_json
+
+
 create_json(foreign_car_clear)
 print(create_json(rus_car_clear))
-
-# for i in range(len_info_no_na):
-#     try_json["art"] = float(info_no_na.iloc[i]["Код AGC"])
-#     try_json["eurocode"] = info_no_na.iloc[i]["Еврокод"]
-#     try_json["name"] = info_no_na.iloc[i]["Наименование"]
-#     try_json["catalog"] = 'Автостекло. Аксессуары. Клей'
-#     try_json["category"] = info_no_na.iloc[i]["Вид стекла"]
-#     try_json["price"] = 50
-#     with open("data_file.json", "w") as write_file:
-#         json.dump(try_json, write_file, ensure_ascii=False, )
-#     list_json.append(try_json)
-# print(list_json)
-# print(json.dumps(list_json, ensure_ascii=False))
-# print(*list_json)
-# # with open("data_file.json", "w") as write_file:
-# #     json.dump(list_json, write_file)

@@ -18,18 +18,6 @@
         "category": Вид стекла,
         "price": Цена ОПТ или Фиксированная
     }
-
-Задание 2:
-Опираясь на полученную информацию сформировать катлог для клиента. Для клиента нужны только товары из категорий
-["ветровое", "заднее", "боковое"]
-Цены для клиента рассчитываются по следующему принципу:
-ветровое - (цена price из каталога + 1000) + 5%
-заднее - (цена price из каталога + 800) + 7%
-боковое - цена price из каталога + 10%
-В итоге должны получить excel-файл с расшиернием .xlsx
------------------------------------------------------------------------
-| catalog | category | art | eurocode | oldcode | name | client_price |
------------------------------------------------------------------------
 """
 import json
 
@@ -45,48 +33,65 @@ sales = pd.read_excel(
     sheet_name=['Автостекло. Аксессуары. Клей', "Российский автопром"],
     header=4,
 )
-try_json = {
-
-}
-list_json = []
-json_local = []
+list_json = [] # список, в который записываем словари для JSON
 
 '''Получаем все иномомарки из файла, и удаляем пустые строки'''
 foreign_car = sales['Автостекло. Аксессуары. Клей']  # получаем таблицу иномарок
 foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Наименование", "Цена фиксирована",
-                                "ОПТ"]].head()  # фильтруем иномарки по нужным столбцам, вспомогательная переменная
+                                "ОПТ"]]  # фильтруем иномарки по нужным столбцам, вспомогательная переменная
 foreign_car_clear = foreign_car_supp[foreign_car_supp[
     "Код AGC"].notna()]  # фильтруем таблицу иномарок, убирая пустые строки ориентируясь на столбец "Код AGC"
 
 '''Получаем все отечественные из файла, и удаляем пустые строки'''
 rus_car = sales['Российский автопром']  # получаем таблицу отечественных
 rus_car_supp = rus_car[["Вид стекла", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована",
-                        "ОПТ"]].head(20)  # фильтруем отечетвенные по нужным столбцам, вспомогательная переменная
+                        "ОПТ"]]  # фильтруем отечетвенные по нужным столбцам, вспомогательная переменная
 rus_car_clear = rus_car_supp[rus_car_supp[
     "Код AGC"].notna()]  # фильтруем таблицу отечественных, убирая пустые строки ориентируясь на столбец "Код AGC"
 
 
 def create_json(data):
-
-    list_json_1 = []
     for i in range(len(data)):
-        try_json_1 = {}
-        try_json_1["art"] = int(data.iloc[i]["Код AGC"])
-        try_json_1["name"] = data.iloc[i]["Наименование"]
+        dict_element = {}
+        dict_element["art"] = int(data.iloc[i]["Код AGC"])
+        dict_element["name"] = data.iloc[i]["Наименование"]
         if "Еврокод" in data:
-            try_json_1["eurocode"] = data.iloc[i]["Еврокод"]
-            try_json_1["catalog"] = 'Автостекло. Аксессуары. Клей'
-            try_json_1["price"] = data.iloc[i]['ОПТ']
+            dict_element["eurocode"] = data.iloc[i]["Еврокод"]
+            dict_element["catalog"] = 'Автостекло. Аксессуары. Клей'
+            dict_element["price"] = data.iloc[i]['ОПТ']
         else:
-            try_json_1["catalog"] = 'Российский автопром'
+            dict_element["catalog"] = 'Российский автопром'
         if str(data.iloc[i]['ОПТ']) == '*':
-            try_json_1["price"] = float(data.iloc[i]['Цена фиксирована'])
+            dict_element["price"] = float(data.iloc[i]['Цена фиксирована'])
         else:
-            try_json_1["price"] = data.iloc[i]['ОПТ']
-        try_json_1["category"] = data.iloc[i]['Вид стекла']
-        list_json.append(try_json_1)
+            dict_element["price"] = data.iloc[i]['ОПТ']
+        dict_element["category"] = data.iloc[i]['Вид стекла']
+        list_json.append(dict_element)
     return list_json
 
 
-create_json(foreign_car_clear)
-print(create_json(rus_car_clear))
+# create_json(foreign_car_clear)
+# print(create_json(rus_car_clear))
+
+'''Записываем полученный писок словарей в JSON  - файл'''
+# with open("data_file.json", "w", encoding='utf-8') as write_file:
+#     json.dump(list_json, write_file, ensure_ascii=False, )
+"""
+
+Задание 2:
+Опираясь на полученную информацию сформировать катлог для клиента. Для клиента нужны только товары из категорий
+["ветровое", "заднее", "боковое"]
+Цены для клиента рассчитываются по следующему принципу:
+ветровое - (цена price из каталога + 1000) + 5%
+заднее - (цена price из каталога + 800) + 7%
+боковое - цена price из каталога + 10%
+В итоге должны получить excel-файл с расшиернием .xlsx
+-----------------------------------------------------------------------
+| catalog | category | art | eurocode | oldcode | name | client_price |
+-----------------------------------------------------------------------
+"""
+
+f = open(r"C:\Users\Admin\Desktop\Study\Гласс рус задание\data_file.json")
+json_local = json.loads(f)
+f.close()
+print(json_local)

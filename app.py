@@ -20,6 +20,7 @@
     }
 """
 import json
+import pprint
 
 import pandas as pd
 import numpy as np
@@ -33,49 +34,33 @@ sales = pd.read_excel(
     sheet_name=['Автостекло. Аксессуары. Клей', "Российский автопром"],
     header=4,
 )
-list_json = [] # список, в который записываем словари для JSON
 
-'''Получаем все иномомарки из файла, и удаляем пустые строки'''
 foreign_car = sales['Автостекло. Аксессуары. Клей']  # получаем таблицу иномарок
-foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Наименование", "Цена фиксирована",
-                                "ОПТ"]]  # фильтруем иномарки по нужным столбцам, вспомогательная переменная
-foreign_car_clear = foreign_car_supp[foreign_car_supp[
-    "Код AGC"].notna()]  # фильтруем таблицу иномарок, убирая пустые строки ориентируясь на столбец "Код AGC"
-
-'''Получаем все отечественные из файла, и удаляем пустые строки'''
-rus_car = sales['Российский автопром']  # получаем таблицу отечественных
-rus_car_supp = rus_car[["Вид стекла", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована",
-                        "ОПТ"]]  # фильтруем отечетвенные по нужным столбцам, вспомогательная переменная
-rus_car_clear = rus_car_supp[rus_car_supp[
-    "Код AGC"].notna()]  # фильтруем таблицу отечественных, убирая пустые строки ориентируясь на столбец "Код AGC"
-
-
-def create_json(data):
-    for i in range(len(data)):
-        dict_element = {}
-        dict_element["art"] = int(data.iloc[i]["Код AGC"])
-        dict_element["name"] = data.iloc[i]["Наименование"]
-        if "Еврокод" in data:
-            dict_element["eurocode"] = data.iloc[i]["Еврокод"]
-            dict_element["catalog"] = 'Автостекло. Аксессуары. Клей'
-            dict_element["price"] = data.iloc[i]['ОПТ']
-        else:
-            dict_element["catalog"] = 'Российский автопром'
-        if str(data.iloc[i]['ОПТ']) == '*':
-            dict_element["price"] = float(data.iloc[i]['Цена фиксирована'])
-        else:
-            dict_element["price"] = data.iloc[i]['ОПТ']
-        dict_element["category"] = data.iloc[i]['Вид стекла']
-        list_json.append(dict_element)
+def create_json(data): #в дату теперь передаем весь датафрейм
+    list_json = []
+    for list in data.keys():
+        foreign_car = data[list]
+        foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована", "ОПТ"]]
+        foreign_car_clear = foreign_car_supp[foreign_car_supp["Код AGC"].notna()]
+        for i in range(len(foreign_car_clear)):
+            dict_element = {}
+            dict_element["art"] = int(foreign_car_clear.iloc[i]["Код AGC"])
+            dict_element["oldcode"] = foreign_car_clear.iloc[i]["Старый Код AGC"]
+            dict_element["name"] = foreign_car_clear.iloc[i]["Наименование"]
+            dict_element["eurocode"] = foreign_car_clear.iloc[i]["Еврокод"]
+            dict_element["catalog"] = list
+            if str(foreign_car_clear.iloc[i]['ОПТ']) == '*':
+                dict_element["price"] = float(foreign_car_clear.iloc[i]['Цена фиксирована'])
+            else:
+                dict_element["price"] = foreign_car_clear.iloc[i]['ОПТ']
+            dict_element["category"] = foreign_car_clear.iloc[i]['Вид стекла']
+            list_json.append(dict_element)
     return list_json
 
 
-# create_json(foreign_car_clear)
-# print(create_json(rus_car_clear))
-
-'''Записываем полученный писок словарей в JSON  - файл'''
-# with open("data_file.json", "w", encoding='utf-8') as write_file:
-#     json.dump(list_json, write_file, ensure_ascii=False, )
+'''Записываем полученный список словарей в JSON  - файл'''
+with open("data_file.json", "w", encoding='utf-8') as write_file:
+    json.dump(create_json(sales), write_file, ensure_ascii=False, indent=4)
 """
 
 Задание 2:
@@ -91,7 +76,58 @@ def create_json(data):
 -----------------------------------------------------------------------
 """
 
-f = open(r"C:\Users\Admin\Desktop\Study\Гласс рус задание\data_file.json")
-json_local = json.loads(f)
-f.close()
-print(json_local)
+# # with open('data_file.json', 'r', encoding='utf-8') as json_file:
+# #     json_local = json.load(json_file)
+# #
+# # detail_data = []
+# # detail_columns = []
+#
+# def client_price(data):
+#     if data['category'] == "ветровое":
+#         price = (float(data['price'])+1000)+(float(data['price'])+1000)*0.05
+#         return price
+#     elif data['category'] == "заднее":
+#         price = (float(data['price'])+800)+(float(data['price'])+800)*0.07
+#         return price
+#     elif data['category'] == "боковое":
+#         price = float(data['price'])+float(data['price'])*0.1
+#         return price
+#
+#
+# for i in json_local:
+#     if i['category'] == "ветровое" or "заднее" or "боковое":
+#         detail_data_unit = []
+#         if "eurocode" in i.keys():
+#             detail_data_unit.append(i['catalog'])
+#             detail_data_unit.append(i['category'])
+#             detail_data_unit.append(i['art'])
+#             detail_data_unit.append(i['eurocode'])
+#             detail_data_unit.append('0')
+#             detail_data_unit.append(i['name'])
+#             detail_data_unit.append(client_price(i))
+#         else:
+#             detail_data_unit.append(i['catalog'])
+#             detail_data_unit.append(i['category'])
+#             detail_data_unit.append(i['art'])
+#             detail_data_unit.append(0)
+#             detail_data_unit.append(i['oldcode'])
+#             detail_data_unit.append(i['name'])
+#             detail_data_unit.append(client_price(i))
+#         detail_data.append(detail_data_unit)
+#
+#
+# print(detail_data)
+''' для записи экселя
+df1 = pd.DataFrame([[первая строка], [вторая строка]...и еще 3 тыщи строк ],
+                   columns=['catalog', 'category', 'art', 'eurocode', 'oldcode', 'name', 'client_price'])
+'''
+
+# df1 = pd.DataFrame([['a', 'b'], ['c', 'd']],
+#                    index=['row 1', 'row 2'],
+#                    columns=['col 1', 'col 2'])
+# df1.to_excel("output.xlsx")
+
+
+# for json_data in json_local:
+#     pprint.pprint(json_data)
+

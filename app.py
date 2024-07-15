@@ -35,8 +35,6 @@ sales = pd.read_excel(
     header=4,
 )
 
-foreign_car = sales['Автостекло. Аксессуары. Клей']  # получаем таблицу иномарок
-
 
 def create_json(data):  # в дату теперь передаем весь датафрейм
     list_json = []
@@ -79,57 +77,61 @@ with open("data_file.json", "w", encoding='utf-8') as write_file:
 -----------------------------------------------------------------------
 """
 
-# # with open('data_file.json', 'r', encoding='utf-8') as json_file:
-# #     json_local = json.load(json_file)
-# #
-# # detail_data = []
-# # detail_columns = []
-#
-# def client_price(data):
-#     if data['category'] == "ветровое":
-#         price = (float(data['price'])+1000)+(float(data['price'])+1000)*0.05
-#         return price
-#     elif data['category'] == "заднее":
-#         price = (float(data['price'])+800)+(float(data['price'])+800)*0.07
-#         return price
-#     elif data['category'] == "боковое":
-#         price = float(data['price'])+float(data['price'])*0.1
-#         return price
-#
-#
-# for i in json_local:
-#     if i['category'] == "ветровое" or "заднее" or "боковое":
-#         detail_data_unit = []
-#         if "eurocode" in i.keys():
-#             detail_data_unit.append(i['catalog'])
-#             detail_data_unit.append(i['category'])
-#             detail_data_unit.append(i['art'])
-#             detail_data_unit.append(i['eurocode'])
-#             detail_data_unit.append('0')
-#             detail_data_unit.append(i['name'])
-#             detail_data_unit.append(client_price(i))
-#         else:
-#             detail_data_unit.append(i['catalog'])
-#             detail_data_unit.append(i['category'])
-#             detail_data_unit.append(i['art'])
-#             detail_data_unit.append(0)
-#             detail_data_unit.append(i['oldcode'])
-#             detail_data_unit.append(i['name'])
-#             detail_data_unit.append(client_price(i))
-#         detail_data.append(detail_data_unit)
-#
-#
-# print(detail_data)
+with open('data_file.json', 'r', encoding='utf-8') as json_file:
+    json_local = json.load(json_file)
+
+detail_data = []
+detail_columns = []
+
+def client_price(data):
+    if data['category'] == "ветровое":
+        price = (float(data['price'])+1000)+(float(data['price'])+1000)*0.05
+        return price
+    elif data['category'] == "заднее":
+        price = (float(data['price'])+800)+(float(data['price'])+800)*0.07
+        return price
+    elif data['category'] == "боковое":
+        price = float(data['price'])+float(data['price'])*0.1
+        return price
+
+
+for i in json_local:
+    if i['category'] == "ветровое" or "заднее" or "боковое":
+        detail_data_unit = []
+        if "eurocode" in i.keys():
+            detail_data_unit.append(i['catalog'])
+            detail_data_unit.append(i['category'])
+            detail_data_unit.append(i['art'])
+            detail_data_unit.append(i['eurocode'])
+            detail_data_unit.append('0')
+            detail_data_unit.append(i['name'])
+            detail_data_unit.append(client_price(i))
+        else:
+            detail_data_unit.append(i['catalog'])
+            detail_data_unit.append(i['category'])
+            detail_data_unit.append(i['art'])
+            detail_data_unit.append(0)
+            detail_data_unit.append(i['oldcode'])
+            detail_data_unit.append(i['name'])
+            detail_data_unit.append(client_price(i))
+        detail_data.append(detail_data_unit)
+
+
+print(detail_data)
 ''' для записи экселя
 df1 = pd.DataFrame([[первая строка], [вторая строка]...и еще 3 тыщи строк ],
                    columns=['catalog', 'category', 'art', 'eurocode', 'oldcode', 'name', 'client_price'])
 '''
+#
+df1 = pd.DataFrame(detail_data,
+                   columns=['catalog', 'category', 'art', 'eurocode', 'oldcode', 'name', 'client_price'])
+df1.to_excel("output.xlsx")
 
-# df1 = pd.DataFrame([['a', 'b'], ['c', 'd']],
-#                    index=['row 1', 'row 2'],
-#                    columns=['col 1', 'col 2'])
-# df1.to_excel("output.xlsx")
 
+"""df1 = pd.DataFrame([['a', 'b'], ['c', 'd']],
+                   index=['row 1', 'row 2'],
+                   columns=['col 1', 'col 2'])
+df1.to_excel("output.xlsx") """
 
 # for json_data in json_local:
 #     pprint.pprint(json_data)

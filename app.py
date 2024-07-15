@@ -36,11 +36,14 @@ sales = pd.read_excel(
 )
 
 foreign_car = sales['Автостекло. Аксессуары. Клей']  # получаем таблицу иномарок
-def create_json(data): #в дату теперь передаем весь датафрейм
+
+
+def create_json(data):  # в дату теперь передаем весь датафрейм
     list_json = []
     for list in data.keys():
         foreign_car = data[list]
-        foreign_car_supp = foreign_car[["Вид стекла", "Еврокод", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована", "ОПТ"]]
+        foreign_car_supp = foreign_car[
+            ["Вид стекла", "Еврокод", "Код AGC", "Старый Код AGC", "Наименование", "Цена фиксирована", "ОПТ"]]
         foreign_car_clear = foreign_car_supp[foreign_car_supp["Код AGC"].notna()]
         for i in range(len(foreign_car_clear)):
             dict_element = {}
@@ -130,4 +133,3 @@ df1 = pd.DataFrame([[первая строка], [вторая строка]...�
 
 # for json_data in json_local:
 #     pprint.pprint(json_data)
-

@@ -14,7 +14,7 @@ def _get_price(value):
         return value["ОПТ"]
 
 
-def _get_json_element(value, sheet_name):
+def _get_json_element(value: dict, sheet_name: str) -> dict:
     try:
         return {
             "art": int(value["Код AGC"]),
@@ -41,7 +41,7 @@ def _get_excel_element(value: dict) -> dict:
     }
 
 
-def _parse_excel(data: dict):  # в дату теперь передаем весь датафрейм
+def _parse_excel(data: dict) -> list[dict]:
     price_list = []
     for sheet_name in data.keys():
         current_sheet = data[sheet_name]
@@ -63,12 +63,12 @@ def _calculate_client_price(category: str, price: float) -> float | None:
         return None
 
 
-def _write_json(value, json_name=default_json_name):
+def _write_json(value: list[dict], json_name: str = default_json_name):
     with open(json_name, "w", encoding="utf-8") as write_file:
         json.dump(value, write_file, ensure_ascii=False, indent=4)
 
 
-def _read_json(json_name=default_json_name):
+def _read_json(json_name: str = default_json_name) -> list[dict]:
     with open(json_name, "r", encoding="utf-8") as json_file:
         return json.load(json_file)
 
@@ -84,7 +84,7 @@ def _prepare_data_for_excel(data: list[dict]) -> list[dict]:
 def _write_excel(value: list[dict]):
     df = pd.DataFrame(data=[list(val.values()) for val in value],
                       columns=list(value[0].keys()))
-    df.to_excel("client_catalog.xlsx", index = False)
+    df.to_excel("client_catalog.xlsx", index=False)
 
 
 def _read_excel(sheet_names: list[str], excel_url: str) -> dict:
@@ -96,16 +96,17 @@ def _read_excel(sheet_names: list[str], excel_url: str) -> dict:
     )
 
 
-def main(url=default_url):
-    """Решение задачи 1"""
-    data_exel = _read_excel(list(catalog_name.keys()), url)
-    json_data = _parse_excel(data_exel)
-    _write_json(json_data)
-
-    """Решение задачи 2"""
-    json_data = _read_json()
-    data_excel = _prepare_data_for_excel(json_data)
-    _write_excel(data_excel)
+def main(url=default_url, write=1, read=1):
+    if write:
+        """Решение задачи 1"""
+        data_exel = _read_excel(list(catalog_name.keys()), url)
+        json_data = _parse_excel(data_exel)
+        _write_json(json_data)
+    if read:
+        """Решение задачи 2"""
+        json_data = _read_json()
+        data_excel = _prepare_data_for_excel(json_data)
+        _write_excel(data_excel)
 
 
 main()

@@ -35,7 +35,7 @@
 функция `main()` принимает три не обязательных аргумента `main(url=default_url, write=1, read=1)`
 `url` - принимает адрес (в **кавычках**) файла на удаленном репозитории например, на случай, загрузки нового файла с **идентичной структурой** 
 
-`url = "https://github.com/Pahteev/test_task1/raw/main/files/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D0%9E%D0%BF%D1%82.xlsx"`
+`url = "https://github.com/BorisMiasnikov/test_glass/raw/master/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D0%9E%D0%BF%D1%82.xlsx"`
 
 Если нужно **только записать новый** json-файл в функцию нужно передать `main(read=0)`
 
@@ -51,6 +51,5 @@
 
 Для запуска скрипта с пользовательскими аргументами, выполнить команду 
 
-    python read_write_excel_json.py main("https://github.com/Pahteev/test_task1/raw/main/files/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D
-    0%9E%D0%BF%D1%82.xlsx", write=1, read=1)
+    python read_write_excel_json.py main("https://github.com/BorisMiasnikov/test_glass/raw/master/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D0%9E%D0%BF%D1%82.xlsx", write=1, read=1)
 

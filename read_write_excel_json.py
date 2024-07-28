@@ -6,7 +6,6 @@ catalog_name = {"Автостекло. Аксессуары. Клей": "Ино�
 category_filter = ["ветровое", "заднее", "боковое", ]
 default_json_name = "price_list.json"
 
-
 def _get_price(value):
     if str(value["ОПТ"]) == "*":
         return float(value["Цена фиксирована"])
@@ -43,12 +42,13 @@ def _get_excel_element(value: dict) -> dict:
 
 def _parse_excel(data: dict) -> list[dict]:
     price_list = []
+    print(data)
     for sheet_name in data.keys():
         current_sheet = data[sheet_name]
         for i in range(len(current_sheet)):
             sheet_row = current_sheet.iloc[i]
             if not sheet_row.isnull()["Вид стекла"] and not sheet_row.isnull()["Код AGC"]:
-                price_list.append(_get_json_element(sheet_row, sheet_name))
+                price_list.append(_get_json_element(value=sheet_row, sheet_name=sheet_name))
     return price_list
 
 
@@ -77,7 +77,7 @@ def _prepare_data_for_excel(data: list[dict]) -> list[dict]:
     detail_data = []
     for i in data:
         if i.get("category") in category_filter:
-            detail_data.append(_get_excel_element(i))
+            detail_data.append(_get_excel_element(value=i))
     return detail_data
 
 
@@ -95,7 +95,6 @@ def _read_excel(sheet_names: list[str], excel_url: str) -> dict:
         header=4,
     )
 
-
 def main(url=default_url, write=1, read=1):
     if write:
         """Решение задачи 1"""
@@ -108,5 +107,5 @@ def main(url=default_url, write=1, read=1):
         data_excel = _prepare_data_for_excel(json_data)
         _write_excel(data_excel)
 
-
-main()
+if __name__ == "__main__":
+    main()

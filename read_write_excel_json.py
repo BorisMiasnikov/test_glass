@@ -1,10 +1,16 @@
+import datetime
 import json
 import pandas as pd
 
-default_url = "https://github.com/Pahteev/test_task1/raw/main/files/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D0%9E%D0%BF%D1%82.xlsx"
+default_url = "https://github.com/BorisMiasnikov/test_glass/raw/master/%D0%9F%D1%80%D0%B0%D0%B9%D1%81-%D0%BB%D0%B8%D1%81%D1%82%20AGC%202024.03.04%20%D0%9E%D0%BF%D1%82.xlsx"
 catalog_name = {"Автостекло. Аксессуары. Клей": "Иномарки", "Российский автопром": "Российский автопром"}
 category_filter = ["ветровое", "заднее", "боковое", ]
 default_json_name = "price_list.json"
+price_modifier = {
+    "ветровое": lambda price: (price + 1000) * 1.05,
+    "заднее": lambda price: (price + 800) * 1.07,
+    "боковое": lambda price: price * 1.1,
+}
 
 def _get_price(value):
     if str(value["ОПТ"]) == "*":
@@ -52,15 +58,10 @@ def _parse_excel(data: dict) -> list[dict]:
     return price_list
 
 
-def _calculate_client_price(category: str, price: float) -> float | None:
-    if category == "ветровое":
-        return (price + 1000) * 1.05
-    elif category == "заднее":
-        return (price + 800) * 1.07
-    elif category == "боковое":
-        return price * 1.1
-    else:
-        return None
+
+def _calculate_client_price(category: str, price: float) -> float:
+    return price_modifier[category](price)
+
 
 
 def _write_json(value: list[dict], json_name: str = default_json_name):
@@ -107,5 +108,9 @@ def main(url=default_url, write=1, read=1):
         data_excel = _prepare_data_for_excel(json_data)
         _write_excel(data_excel)
 
+start = datetime.datetime.now()
+
 if __name__ == "__main__":
     main()
+finish = datetime.datetime.now()
+print(str(finish - start))

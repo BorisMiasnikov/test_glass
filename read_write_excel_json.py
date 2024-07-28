@@ -48,7 +48,6 @@ def _get_excel_element(value: dict) -> dict:
 
 def _parse_excel(data: dict) -> list[dict]:
     price_list = []
-    print(data)
     for sheet_name in data.keys():
         current_sheet = data[sheet_name]
         for i in range(len(current_sheet)):
@@ -108,9 +107,6 @@ def main(url=default_url, write=1, read=1):
         data_excel = _prepare_data_for_excel(json_data)
         _write_excel(data_excel)
 
-start = datetime.datetime.now()
 
 if __name__ == "__main__":
     main()
-finish = datetime.datetime.now()
-print(str(finish - start))
